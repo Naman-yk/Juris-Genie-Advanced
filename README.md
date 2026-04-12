@@ -1,76 +1,130 @@
+
+
+
 # JurisGenie — Deterministic Legal Infrastructure Stack
 
-A production-grade legal contract analysis and execution engine built on deterministic, pure-function principles. This repository contains the complete "Infrastructure for India" stack (and global legal markets), from AI ingestion to deterministic state-machine execution and blockchain anchoring.
+**Production-grade AI contract intelligence and execution engine** built on strict deterministic principles.
 
-## High-Level Architecture
+Turn any legal document (PDF, contract, judgment) into structured, verifiable, and blockchain-anchored smart contracts — with zero hallucination risk in the execution layer.
 
-| Layer | Component | Package/Module | Purpose |
-|-------|-----------|----------------|---------|
-| **L7** | **Pro UI** | `packages/ui` | Next.js Advanced Dashboard with Blockchain visualization & core analysis |
-| **L6** | **Gateway** | `intelligence-engine` | Unified Node.js gateway (port 8000) for Classic vs Pro experience |
-| **L6** | **Backend** | `packages/platform` | REST API, SQLite persistence, and Orchestration layer |
-| **L5** | **Execution** | `packages/execution` | State machine, obligation lifecycle, and penalty computation (Pure Function) |
-| **L4** | **Engine** | `packages/engine` | Deterministic rule evaluation (Pure Function) |
-| **L3** | **Core** | `packages/core` | Canonical serialization, SHA-256 hashing, and Legal Invariants |
-| **AI** | **Inference** | `intelligence-engine` | RAG-powered clause extraction and legal intelligence |
+Built **completely solo over 2 months** for real-world legal, banking, and insurance use cases in India and globally.
 
-## Core Guarantees
+---
 
-1. **Determinism**: `evaluate(input) === evaluate(input)` — reproducible results across any machine.
-2. **Purity**: Core logic (L3-L5) performs no I/O, ensuring absolute reliability.
-3. **Hash Verification**: Every result is cryptographically signed with SHA-256 for tamper detection.
-4. **AI Firewall**: Human-in-the-loop verification before AI data enters the execution state.
-5. **Unified Gateway**: Seamless transition from Classic landing pages to Advanced Pro analytics.
+### ✨ Key Highlights
 
-## Prerequisites
+- **Deterministic Execution Engine** — Same input always produces the same output
+- **Full 8-Stage Pipeline** — From raw PDF → AI extraction → compliance → state machine → blockchain anchor
+- **Zero Black-Box AI** in critical paths — Core logic is pure functions with cryptographic verification
+- **Two Experience Modes**:
+  - **Pro Dashboard** — Advanced analytics, State Machine, Attack Simulator, Knowledge Graph
+  - **Classic Quick Mode** — Fast upload + AI chat for instant risk analysis
 
-- **Node.js**: ≥ 20.0.0
-- **pnpm**: `npm install -g pnpm`
-- **API Keys**: Google Gemini (AI) and Pinecone (Vector Store)
+---
 
-## Quick Start (Local Development)
+### 🚀 Live Demos
+
+**Pro Version** (Full Platform – Recommended)  
+→ [https://jurisgenie-pro-6ijp.onrender.com](https://jurisgenie-pro-6ijp.onrender.com/pro)
+
+**Quick Analysis + AI Chat** (Fast risk scan)  
+→ [https://jurisgenie-classic-6ijp.onrender.com/upload.html](https://jurisgenie-classic-6ijp.onrender.com/upload.html)
+
+---
+
+### High-Level Architecture
+
+| Layer | Component              | Purpose                                      |
+|-------|------------------------|----------------------------------------------|
+| L7    | Pro UI                 | Next.js Advanced Dashboard + Visualizations  |
+| L6    | Gateway                | Unified entry point (Classic vs Pro)         |
+| L6    | Platform               | REST API + SQLite + Orchestration            |
+| L5    | Execution              | State Machine + Obligation Lifecycle         |
+| L4    | Engine                 | Deterministic Rule Evaluation (Pure Function)|
+| L3    | Core                   | Serialization, SHA-256 Hashing, Legal Invariants |
+| AI    | Inference Engine       | RAG + Gemini Pro for clause extraction       |
+
+---
+
+### Core Guarantees
+
+1. **Determinism** — `evaluate(input) === evaluate(input)` on any machine
+2. **Purity** — Core logic (L3–L5) performs zero I/O
+3. **Cryptographic Integrity** — Every result is SHA-256 hashed and verifiable
+4. **AI Firewall** — Human-in-the-loop before AI data enters execution layer
+5. **Production Observability** — Real-time metrics (AI: ~345ms, Engine: ~12ms, Blockchain: ~8.9s)
+
+---
+
+### Prerequisites
+
+- Node.js ≥ 20.0.0
+- pnpm
+- Google Gemini API Key
+- Pinecone API Key (optional for full RAG)
+
+### Quick Start
 
 ```bash
-# 1. Install all dependencies
+# Clone and install
+git clone <repo-url>
+cd jurisgenie
 pnpm install
 
-# 2. Run the full unified stack (Gateway + Pro UI + Backend)
-# Port 8000 (Gateway), 3000 (Pro UI), 3001 (Backend)
-npm run dev:all (custom script) or run them in separate terminals:
-- Terminal A: cd packages/platform && npm run dev
-- Terminal B: cd packages/ui && npm run dev
-- Terminal C: cd intelligence-engine && npm run dev
+# Run full stack (Gateway + Pro UI + Backend)
+pnpm run dev:all
 ```
 
-## Deployment via Render
+Ports:
+- 8000 → Gateway (Classic + Pro routing)
+- 3000 → Pro Dashboard
+- 3001 → Backend API
 
-This project is pre-configured for **Render Blueprints**. 
-Simply connect this repository to Render, and it will automatically provision:
-- **jurisgenie-classic**: The public gateway and landing page.
-- **jurisgenie-backend**: The transactional API.
-- **jurisgenie-pro**: The mission-critical analytics dashboard.
+---
 
-*See `render.yaml` for configuration details.*
+### Deployment
 
-## Project Structure
+Pre-configured for **Render Blueprints**.  
+Just connect this repo to Render — it will auto-deploy:
+
+- `jurisgenie-classic` (Quick Analysis)
+- `jurisgenie-backend`
+- `jurisgenie-pro` (Full Dashboard)
+
+See `render.yaml` for complete configuration.
+
+---
+
+### Project Structure
 
 ```
 .
-├── intelligence-engine/   # Gateway, Classic UI (HTML/JS), and RAG Backend
+├── intelligence-engine/     # Gateway + Classic UI + RAG
 ├── packages/
-│   ├── ui/               # Next.js 14 Pro UI Dashboard
-│   ├── platform/         # Express API and persistence
-│   ├── core/             # L3: Types + Serialization + Hashing
-│   ├── engine/           # L4: Rule Engine
-│   └── execution/        # L5: State Machine
-├── render.yaml           # Deployment blueprint
-└── replace-urls.js       # Production URL sanitizer
+│   ├── ui/                  # Next.js 14 Pro Dashboard
+│   ├── platform/            # Express API + Persistence
+│   ├── core/                # L3: Types + Hashing
+│   ├── engine/              # L4: Deterministic Engine
+│   └── execution/           # L5: State Machine
+├── render.yaml
+└── replace-urls.js
 ```
 
-## Tech Stack
+---
 
-- **Frontend**: Next.js 14, Tailwind CSS, Lucide React (Pro); Vanilla JS/Tailwind (Classic)
-- **Backend**: Node.js/Express, better-sqlite3
-- **AI**: Google Gemini Pro, Pinecone Vector DB
-- **Determinism**: Decimal.js, SHA-256 Hashing
-- **Build System**: pnpm workspaces, Turborepo-ready
+### Tech Stack
+
+- **Frontend**: Next.js 14 + Tailwind + React Flow + Monaco Editor
+- **Backend**: Node.js + Express + better-sqlite3
+- **AI**: Google Gemini Pro + Pinecone Vector DB
+- **Determinism**: Pure functions + Decimal.js + SHA-256
+- **Build**: pnpm workspaces
+
+---
+
+**Built solo in 2 months with real-world legal pain in mind.**
+
+Perfect for banks, insurance companies, law firms, and SMEs dealing with contract risk and disputes.
+
+---
+
