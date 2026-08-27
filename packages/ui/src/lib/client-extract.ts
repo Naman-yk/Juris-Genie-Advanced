@@ -25,13 +25,40 @@ function extractParties(text: string): { partyA: string; partyB: string } {
     if (vs) return { partyA: vs[1].trim(), partyB: vs[2].trim() };
 
     // Pattern: "between X and Y"
-    const between = text.match(/between\s+([A-Z][A-Za-z\s,.]+?)(?:\s+and\s+|\s*&\s*)([A-Z][A-Za-z\s,.]+?)(?:\.|,|\()/i);
+    const between = text.match(/between\s+([A-Z][A-Za-z\s,.]+?)(?:\s+and\s+|\s*\&\s*)([A-Z][A-Za-z\s,.]+?)(?:\.|,|\()/i);
     if (between) return { partyA: between[1].trim(), partyB: between[2].trim() };
+
+    // Pattern: COMPANY: X / INVESTOR: Y (SAFE agreements, term sheets)
+    const companyLabel = text.match(/COMPANY:\s*([A-Z][A-Za-z\s,.'&]+?(?:Inc\.?|LLC|Corp(?:oration)?|Ltd\.?|Limited|Co\.))/i);
+    const investorLabel = text.match(/INVESTOR:\s*([A-Z][A-Za-z\s,.'&]+?(?:Inc\.?|LLC|Corp(?:oration)?|Ltd\.?|Limited|Fund|LP|Partners))/i);
+    if (companyLabel && investorLabel) return { partyA: companyLabel[1].trim(), partyB: investorLabel[1].trim() };
+
+    // Pattern: (the "Company") ... (the "Investor"/"Purchaser"/"Buyer")
+    const theCompany = text.match(/([A-Z][A-Za-z\s,.'&]+?(?:Inc\.?|LLC|Corp(?:oration)?|Ltd\.?|Limited|Co\.))[,\s]*(?:a\s+\w+\s+\w+\s+)?(?:\((?:the\s+)?"Company"\))/i);
+    const theInvestor = text.match(/([A-Z][A-Za-z\s,.'&]+?(?:Inc\.?|LLC|Corp(?:oration)?|Ltd\.?|Limited|Fund|LP|Partners))[,\s]*(?:\((?:the\s+)?"(?:Investor|Purchaser|Buyer|Lender)"\))/i);
+    if (theCompany && theInvestor) return { partyA: theCompany[1].trim(), partyB: theInvestor[1].trim() };
+    
+    // Pattern: labeled parties — Landlord/Tenant, Employer/Employee, Licensor/Licensee, Seller/Buyer
+    const labeledPatterns: [RegExp, RegExp][] = [
+        [/(?:Landlord|Lessor)[:\s]+([A-Z][A-Za-z\s,.&']{2,50}?)(?:\(|,\s*(?:a |an |residing|aged|of))/i, /(?:Tenant|Lessee)[:\s]+([A-Z][A-Za-z\s,.&']{2,50}?)(?:\(|,\s*(?:a |an |residing|aged|of))/i],
+        [/(?:Employer)[:\s]+([A-Z][A-Za-z\s,.&']{2,50}?)(?:\(|,\s*(?:a |an |residing|aged|of))/i, /(?:Employee)[:\s]+([A-Z][A-Za-z\s,.&']{2,50}?)(?:\(|,\s*(?:a |an |residing|aged|of))/i],
+        [/(?:Seller|Vendor)[:\s]+([A-Z][A-Za-z\s,.&']{2,50}?)(?:\(|,\s*(?:a |an |residing|aged|of))/i, /(?:Buyer|Purchaser)[:\s]+([A-Z][A-Za-z\s,.&']{2,50}?)(?:\(|,\s*(?:a |an |residing|aged|of))/i],
+        [/(?:Licensor)[:\s]+([A-Z][A-Za-z\s,.&']{2,50}?)(?:\(|,\s*(?:a |an |residing|aged|of))/i, /(?:Licensee)[:\s]+([A-Z][A-Za-z\s,.&']{2,50}?)(?:\(|,\s*(?:a |an |residing|aged|of))/i],
+    ];
+    for (const [pA, pB] of labeledPatterns) {
+        const mA = text.match(pA);
+        const mB = text.match(pB);
+        if (mA && mB) return { partyA: mA[1].trim(), partyB: mB[1].trim() };
+    }
 
     // Pattern: Complainant / Accused
     const complainant = text.match(/(?:complainant|petitioner|plaintiff)[:\s]+([A-Z][A-Za-z\s.]{2,40})/i);
     const accused = text.match(/(?:accused|respondent|defendant)[:\s]+([A-Z][A-Za-z\s.]{2,40})/i);
     if (complainant && accused) return { partyA: complainant[1].trim(), partyB: accused[1].trim() };
+
+    // Pattern: "By: Name, Title" at signature blocks
+    const signatories = [...text.matchAll(/By:\s*([A-Z][A-Za-z\s.]{2,40}),\s*(?:CEO|Director|Managing|President|Partner|Founder)/gi)];
+    if (signatories.length >= 2) return { partyA: signatories[0][1].trim(), partyB: signatories[1][1].trim() };
 
     // Fallback: first two capitalized multi-word names
     const names = text.match(/(?:Mr\.|Ms\.|Mrs\.|Shri|Smt\.?)\s*([A-Z][A-Za-z\s]{2,30})/gi) || [];
