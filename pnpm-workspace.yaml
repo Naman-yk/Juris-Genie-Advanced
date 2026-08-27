@@ -2,6 +2,6 @@ packages:
   - 'packages/*'
 
 allowBuilds:
-  - better-sqlite3
-  - canvas
-  - esbuild
+  better-sqlite3: true
+  canvas: true
+  esbuild: true
