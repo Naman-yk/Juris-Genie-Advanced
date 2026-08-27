@@ -313,7 +313,7 @@ app.post('/contracts/upload', upload.single('file'), async (req: Request, res: R
 
         const fileName = req.file.originalname || 'Untitled Document';
         const title = fileName.replace(/\.(pdf|docx?|txt|json)$/i, '');
-        
+
         // Parse PDF text or fallback to utf-8 text representation
         let fileContent = '';
         if (req.file.mimetype === 'application/pdf' || fileName.toLowerCase().endsWith('.pdf')) {
@@ -370,14 +370,14 @@ app.post('/contracts/upload', upload.single('file'), async (req: Request, res: R
 
         // Pattern 1: corporate suffixes (any case)
         const corpPartyMatch = fileContent.match(/between ([A-Z][a-zA-Z\s,]+(?:Inc|LLC|Corp|Corporation|Ltd|Private|Pvt|Limited))\b.*?(?:and|\&)\s+([A-Z][a-zA-Z\s,]+(?:Inc|LLC|Corp|Corporation|Ltd|Private|Pvt|Limited))\b/i);
-        
+
         // Pattern 2: "BETWEEN ... AND" (Indian legal style)
         const individualPartyMatch = fileContent.match(/BETWEEN\s+(?:Mr\.?|Ms\.?|Mrs\.?|Shri\.?|Smt\.?)?\s*([A-Z][A-Z\s.]{2,40}?)\s*(?:,|\(|son|daughter|aged|residing|represented)/i);
         const individualPartyMatch2 = fileContent.match(/(?:;\s*AND|\)\s*AND|AND)\s+(?:Mr\.?|Ms\.?|Mrs\.?|Shri\.?|Smt\.?)?\s*([A-Z][A-Z\s.]{2,40}?)\s*(?:,|\(|son|daughter|aged|residing|represented)/i);
-        
+
         // Pattern 3: "X versus Y" (court cases)
         const versusMatch = fileContent.match(/([A-Z][A-Z\s]{2,50})\s+(?:versus|vs\.?|V\/s\.?|V\.)\s+([A-Z][A-Z\s]{2,50})/i);
-        
+
         // Pattern 4: Appellant...Respondent pattern
         const appellantMatch = fileContent.match(/([A-Z][A-Z\s]{2,50})\b\s*(?:\.{2,}|\n|\s+)\s*(?:Appellant|Petitioner)/i);
         const respondentMatch = fileContent.match(/([A-Z][A-Z\s]{2,50})\b\s*(?:\.{2,}|\n|\s+&\s+ORS)\s*(?:\.{2,}|\n|\s+)\s*(?:Respondent|Defendant)/i);
@@ -410,14 +410,14 @@ app.post('/contracts/upload', upload.single('file'), async (req: Request, res: R
         const clauses: any[] = [];
         const clauseRegex = /(?:Section|Clause|Article)\s+\d+[^.]*\./gi;
         const matchedClauses = fileContent.match(clauseRegex) || [];
-        
+
         matchedClauses.forEach((text, i) => {
             const obligations: any[] = [];
             const rights: any[] = [];
             const clauseType = text.toLowerCase().includes('payment') ? 'PAYMENT' :
-                              text.toLowerCase().includes('termination') ? 'TERMINATION' :
-                              text.toLowerCase().includes('delivery') ? 'DELIVERY' :
-                              text.toLowerCase().includes('force majeure') ? 'FORCE_MAJEURE' : 'GENERAL';
+                text.toLowerCase().includes('termination') ? 'TERMINATION' :
+                    text.toLowerCase().includes('delivery') ? 'DELIVERY' :
+                        text.toLowerCase().includes('force majeure') ? 'FORCE_MAJEURE' : 'GENERAL';
 
             if (text.toLowerCase().includes('shall') || text.toLowerCase().includes('must')) {
                 obligations.push({
@@ -589,21 +589,21 @@ app.post('/contracts/:id/execute', (req, res) => {
             version: { major: 1, minor: 0, patch: 0 },
             description: "Mocked engine contract",
             parties: [ // Required to be Party[] for invariant C5
-                { 
-                    id: "party-1", 
-                    role: "OTHER", 
-                    name: contract.parties.split(' ↔ ')[0] || "Party 1", 
-                    jurisdiction: { country: 'US' }, 
-                    provenance: 'RULE_DERIVED', 
-                    schema_version: { major: 1, minor: 0, patch: 0 } 
+                {
+                    id: "party-1",
+                    role: "OTHER",
+                    name: contract.parties.split(' ↔ ')[0] || "Party 1",
+                    jurisdiction: { country: 'US' },
+                    provenance: 'RULE_DERIVED',
+                    schema_version: { major: 1, minor: 0, patch: 0 }
                 },
-                { 
-                    id: "party-2", 
-                    role: "OTHER", 
-                    name: contract.parties.split(' ↔ ')[1] || "Party 2", 
-                    jurisdiction: { country: 'US' }, 
-                    provenance: 'RULE_DERIVED', 
-                    schema_version: { major: 1, minor: 0, patch: 0 } 
+                {
+                    id: "party-2",
+                    role: "OTHER",
+                    name: contract.parties.split(' ↔ ')[1] || "Party 2",
+                    jurisdiction: { country: 'US' },
+                    provenance: 'RULE_DERIVED',
+                    schema_version: { major: 1, minor: 0, patch: 0 }
                 }
             ],
             clauses: [
@@ -628,7 +628,7 @@ app.post('/contracts/:id/execute', (req, res) => {
             schema_version: { major: 1, minor: 0, patch: 0 },
             engine_version: { major: 1, minor: 0, patch: 0 },
         };
-        
+
         engineContract.hash = computeHash(engineContract);
 
         const validation = validateContractStructure(engineContract);
@@ -653,7 +653,7 @@ app.post('/contracts/:id/execute', (req, res) => {
         console.log("DEBUG: Executing request!");
         const result = execute(executionRequest);
         metricsStore.executionsRun++;
-        
+
         // Save the execution state
         const stateRecord: ExecutionStateRecord = {
             id: `exec-${uuidv4()}`,
@@ -796,11 +796,11 @@ app.post('/simulate/attack', (req, res) => {
     let success = false;
     let reason = '';
     let rule = '';
-    
+
     // Pick dynamic data from contract
     const firstObligation = contract.clauses?.[0]?.obligations?.[0]?.id || `obl-${contractId}-0`;
     const randomParty = contract.parties_parsed?.[1]?.name || contract.parties?.split('↔')?.[1] || 'Unknown Party';
-    
+
     switch (attackType) {
         case 'REPLAY':
             reason = `Transaction payload (event payload targeting ${firstObligation}) has already been processed at 2026-03-12T08:00:00Z. Replay prevention triggered.`;
@@ -969,8 +969,8 @@ app.get('/contracts/:id/graph', (req, res) => {
                 confidence: 85 + Math.floor(Math.random() * 15),
                 hash: `hash-clause-${clauseId}`,
                 type: text.toLowerCase().includes('payment') ? 'PAYMENT' :
-                      text.toLowerCase().includes('termination') ? 'TERMINATION' :
-                      text.toLowerCase().includes('delivery') ? 'DELIVERY' : 'GENERAL',
+                    text.toLowerCase().includes('termination') ? 'TERMINATION' :
+                        text.toLowerCase().includes('delivery') ? 'DELIVERY' : 'GENERAL',
             },
         });
         edges.push({ source: 'contract-root', target: clauseId, label: 'contains' });
@@ -1054,7 +1054,7 @@ app.get('/contracts/:id/graph', (req, res) => {
 app.post('/contracts/:id/analyze', async (req: Request, res: Response) => {
     const contract = contractStore.get(req.params.id);
     const bodyContent = req.body?.content || '';
-    
+
     // Use contract content from store, or fall back to content sent in the request body
     const content = contract?.content || bodyContent;
 
